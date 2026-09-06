@@ -14,7 +14,7 @@
   "tools": [
     {
       "name": "connect_kashoo",
-      "description": "Connect Kashoo account via credentials.",
+      "description": "Connect your own Kashoo account with OAuth token/API key and Business ID.",
       "action_type": "write",
       "chain_callable": true,
       "effects": [
@@ -25,24 +25,30 @@
         "properties": {
           "label": {
             "default": "",
-            "description": "Friendly connection label, e.g. Acme Kashoo.",
+            "description": "Friendly connection label, e.g. Acme Kashoo Accounting.",
             "title": "Label",
             "type": "string"
           },
-          "api_key": {
-            "description": "Accounting API Key / OAuth Access Token.",
-            "title": "Api Key",
+          "auth_token": {
+            "description": "Kashoo OAuth Access Token or API Key.",
+            "title": "Auth Token",
+            "type": "string"
+          },
+          "business_id": {
+            "description": "Kashoo Business ID (integer or UUID representing the company account).",
+            "title": "Business Id",
             "type": "string"
           },
           "base_url": {
             "default": "",
-            "description": "Optional custom base URL or instance domain.",
+            "description": "Optional custom base URL (defaults to https://api.kashoo.com).",
             "title": "Base Url",
             "type": "string"
           }
         },
         "required": [
-          "api_key"
+          "auth_token",
+          "business_id"
         ],
         "title": "ConnectParams",
         "type": "object"

@@ -1,15 +1,7 @@
-# Kashoo Connector — Ideal Onboarding
+# Kashoo Connector — Ideal Onboarding Flow
 
-## User outcome
-A user connects a Kashoo account safely, immediately confirms the account that was connected, then starts with a useful read-only operational overview rather than a blank tool list.
-
-## Flow
-1. **Welcome:** explain the connector's verified capability categories and any vendor plan/admin prerequisite.
-2. **Connect:** collect only the credentials documented in `AUTH_AND_CREDENTIALS.md`; provide setup instructions in a modal.
-3. **Verify:** make one harmless identity, tenant, or health request and save a labeled connection only after success.
-4. **First value:** present a focused summary/audit action plus primary resource browsing.
-5. **Operate:** group actions by read, create/update, automation/webhooks and high-impact operations.
-6. **Recover:** show reconnect guidance for expired OAuth, revoked keys, unavailable roles, rate limiting or disabled API access.
-
-## Trust and safety
-High-impact writes always describe their provider-side effect. Destructive actions must use the platform's required confirmation behavior. No provider capability is implied until official discovery verifies it.
+1. User opens Kashoo sidebar in Imperal OS.
+2. Form prompts for Auth Token and Business ID.
+3. Clicking "How do I connect Kashoo?" opens a modal with instructions to locate credentials in Kashoo.
+4. Submission executes `connect_kashoo`, verifying access via `GET /api/v1/businesses/{businessId}`.
+5. Connection is saved and activated.

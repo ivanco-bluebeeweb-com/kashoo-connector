@@ -14,11 +14,14 @@ def _settings_button() -> ui.UINode:
 
 def _help_modal() -> ui.UINode:
     return ui.Modal(
-        trigger=ui.Button("How do I set this up?", variant="ghost", size="sm"),
+        trigger=ui.Button("How do I connect Kashoo?", variant="ghost", size="sm"),
         title="Connecting Kashoo",
         children=[
             ui.Text(
-                "1. Sign in to your Kashoo account and navigate to API/Integration or OAuth settings.\n2. Choose your preferred authentication method (OAuth SSO, API Key / Personal Token, or Client Credentials / Service Account).\n3. Authorize or enter your credentials above and click Connect.",
+                "1. Sign in to your Kashoo account at app.kashoo.com.\n"
+                "2. In Business Settings, find your numeric or UUID Business ID.\n"
+                "3. In User Profile / Integrations, generate an OAuth Access Token or API Key.\n"
+                "4. Enter the Auth Token and Business ID above and click Connect Kashoo.",
                 variant="body"
             )
         ]
@@ -31,81 +34,50 @@ async def kashoo_sidebar(ctx, **kwargs) -> ui.UINode:
         gap=3,
         align="stretch",
         children=[
-            ui.Text("Kashoo", variant="heading"),
-            ui.Stack(
-                direction="v",
-                gap=1,
-                align="stretch",
+            ui.Text("Kashoo Accounting", variant="heading"),
+            ui.Text("Manage invoices, contacts, bills, bank accounts and tax rates via Kashoo REST API.", variant="caption"),
+            ui.Divider(),
+            ui.Form(
+                submit_label="Connect Kashoo",
+                action=ui.Call("connect_kashoo"),
                 children=[
-                    ui.Text("Manage your Kashoo connections and integrations.", variant="caption"),
+                    ui.Stack(
+                        direction="v",
+                        gap=2,
+                        align="stretch",
+                        children=[
+                            ui.Text("Auth Token / API Key", variant="caption"),
+                            ui.Input(
+                                param_name="auth_token",
+                                placeholder="Enter Kashoo OAuth Token or API Key"
+                            ),
+                            ui.Text("Business ID", variant="caption"),
+                            ui.Input(
+                                param_name="business_id",
+                                placeholder="e.g. 12345 or business UUID"
+                            ),
+                            ui.Text("Friendly Label (Optional)", variant="caption"),
+                            ui.Input(
+                                param_name="label",
+                                placeholder="e.g. Acme Kashoo"
+                            ),
+                            ui.Text("Base URL (Optional)", variant="caption"),
+                            ui.Input(
+                                param_name="base_url",
+                                placeholder="https://api.kashoo.com"
+                            )
+                        ]
+                    )
                 ]
             ),
             ui.Divider(),
             ui.Stack(
-                direction="v",
+                direction="h",
                 gap=2,
-                align="stretch",
                 children=[
-                    ui.Button(
-                        "Sign in with Kashoo (OAuth / SSO)",
-                        variant="primary",
-                        size="sm",
-                        icon="login"
-                    ),
-                    ui.Divider(),
-                    ui.Text("Or connect via API Key or Service Account", variant="caption"),
-                    ui.Form(
-                        submit_label="Connect Kashoo",
-                        action=ui.Call("connect_kashoo"),
-                        children=[
-                            ui.Stack(
-                                direction="v",
-                                gap=2,
-                                align="stretch",
-                                children=[
-                                    ui.Stack(
-                                        direction="v",
-                                        gap=1,
-                                        align="stretch",
-                                        children=[
-                                            ui.Text("Authentication Method", variant="label"),
-                                            ui.Select(
-                                                param_name="auth_mode",
-                                                value="api_key",
-                                                options=[
-                                                    {"label": "API Key / Personal Access Token", "value": "api_key"},
-                                                    {"label": "OAuth 2.0 Bearer Token", "value": "oauth"},
-                                                    {"label": "Client Credentials (Service Account / Machine-to-Machine)", "value": "client_credentials"},
-                                                ]
-                                            ),
-                                        ]
-                                    ),
-                                    ui.Stack(
-                                        direction="v",
-                                        gap=1,
-                                        align="stretch",
-                                        children=[
-                                            ui.Text("Connection Label", variant="label"),
-                                            ui.Input(param_name="label", placeholder="e.g. Production Kashoo"),
-                                        ]
-                                    ),
-                                    ui.Stack(
-                                        direction="v",
-                                        gap=1,
-                                        align="stretch",
-                                        children=[
-                                            ui.Text("API Key / Access Token", variant="label"),
-                                            ui.Input(param_name="api_key", placeholder="Paste API Key, Bearer or Access Token"),
-                                        ]
-                                    ),
-                                ]
-                            )
-                        ]
-                    ),
+                    _help_modal(),
+                    _settings_button()
                 ]
-            ),
-            _help_modal(),
-            ui.Spacer(),
-            _settings_button(),
+            )
         ]
     )

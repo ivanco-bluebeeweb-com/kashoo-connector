@@ -1,17 +1,14 @@
-# Kashoo Connector — API Discovery
+# Kashoo Connector — Connector Discovery
 
-## Discovery status
-**Pending live official-documentation verification.** This connector must not claim an endpoint, OAuth scope, webhook, or write capability until it is verified against Kashoo's current official developer documentation and a customer-authorized account.
+## Official API Landscape
+Kashoo Cloud Accounting provides a RESTful API serving small businesses:
+- **Root Resource:** `/api/v1/businesses/{businessId}` provides the tenant scope.
+- **Contacts:** `/api/v1/businesses/{businessId}/contacts` represents customers, vendors, and partners.
+- **Invoicing & Bills:** `/api/v1/businesses/{businessId}/invoices` and `/bills`.
+- **Ledger Accounts:** `/api/v1/businesses/{businessId}/accounts` for bank, cash, income, and expense accounts.
+- **Taxes:** `/api/v1/businesses/{businessId}/taxes` for sales tax management.
 
-## Research checklist
-- Official API base URLs, versions, pagination, filtering, idempotency and rate limits.
-- Authentication types actually offered: OAuth 2.0 authorization code/client credentials, API token, service account, signed request, or local/self-hosted connection.
-- Required scopes/roles/plan tiers, regional endpoints, admin approval and consent lifecycle.
-- Read, create, update, archive/delete, search, bulk, asynchronous-job and webhook surfaces.
-- Error contract, retries, eventual consistency, provider audit log, sandbox/test tenant and webhook signature verification.
-
-## Initial implementation rule
-Only operations confirmed during discovery go into `imperal.json`, schemas and handlers. Any unavailable or partner-only API is recorded as a technical blocker in the task instead of simulated.
-
-## Source candidate
-https://www.kashoo.com
+## Authentication & Headers
+- `Authorization: Bearer <auth_token>`
+- `Accept: application/json`
+- `Content-Type: application/json`

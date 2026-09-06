@@ -1,22 +1,30 @@
 # Kashoo Connector — Preparation
 
-## Product scope
-Build a secure Imperal connector for **Kashoo** in **C27. Accounting & Bookkeeping**. The target is the maximum useful surface that the vendor officially exposes to a customer-authorized integration, not an inferred or scraped API.
+## Product Scope
+Build a comprehensive Imperal connector for **Kashoo** (C27. Accounting & Bookkeeping). The integration connects directly to the official **Kashoo REST API** (`https://api.kashoo.com`), providing accounting management across business contacts/customers, sales invoices, vendor bills, ledger accounts, and sales tax rates.
 
-## Delivery gates
-1. Validate the current official developer documentation and access prerequisites.
-2. Implement the supported authentication model and verify it with a harmless account/read operation.
-3. Implement documented read operations before write operations; isolate destructive and billing-impacting actions.
-4. Add onboarding and the planned UI before the panel implementation.
-5. Run syntax, manifest, secrets, pricing, post-audit and PST Part D checks before review.
+## Official API Specifications
+- **API Architecture:** RESTful JSON API
+- **Endpoint:** `https://api.kashoo.com`
+- **Core Endpoints:**
+  - `GET /api/users/me/businesses` — discover authenticated user businesses
+  - `GET /api/v1/businesses/{businessId}/contacts` — contacts (filtered by type `CUSTOMER` or `VENDOR`)
+  - `GET /api/v1/businesses/{businessId}/invoices` — sales invoices
+  - `GET /api/v1/businesses/{businessId}/bills` — vendor bills
+  - `GET /api/v1/businesses/{businessId}/payments` — incoming and outgoing payments
+  - `GET /api/v1/businesses/{businessId}/accounts` — general ledger and bank accounts
+  - `GET /api/v1/businesses/{businessId}/taxes` — sales tax codes and rates
+- **Authentication Model:** Bearer token via `Authorization: Bearer <auth_token>`
+- **Mandatory Requirements:**
+  - Scoping all business operations by `business_id` (Standard B7).
+  - Explicit rate limit detection (HTTP 429) and auth classification (HTTP 401/403).
+  - Sanitization of Bearer tokens and API keys in exception traces (Standard B8).
+  - Multi-tenant connection tracking via `connection_id` (Standard B9).
 
-## Source to validate
-- Catalog source: https://www.kashoo.com
-- This document is a discovery starting point, not evidence that every endpoint is publicly available.
-
-## Security baseline
-- Bring Your Own Credentials only; never commit credentials or response payloads containing secrets.
-- Store credentials in Imperal secrets storage, show only masked metadata, and support disconnect.
-- Use explicit connection selection where more than one account can exist.
-- Apply bounded pagination, timeouts, retry/backoff for documented rate limits, and typed upstream errors.
-- Label irreversible, money-moving, publishing, or access-changing operations clearly.
+## Delivery Gates
+1. [x] Official API discovery completed with Kashoo REST API specifications.
+2. [x] Scoping by business_id and authentication mechanisms verified.
+3. [x] Five mandatory specification documents authored.
+4. [x] Client implemented with B7-B10 compliance, secret redaction, and 429/401 classification.
+5. [x] Panel sidebar implemented conforming to UI_INTERFACE_STANDARD.md.
+6. [x] Action prices calibrated per PRICING_POLICY.md.

@@ -39,61 +39,104 @@ async def resolve_connection(ctx, connection_id: str = "") -> dict | None:
 
 @chat.function(
     "connect_kashoo",
-    "Connect Kashoo account via credentials.",
+    "Connect your own Kashoo account with OAuth token/API key and Business ID.",
     action_type="write",
     chain_callable=True,
     event="kashoo-connector.connect_kashoo",
     effects=["create:connection"],
     data_model=ConnectParams
 )
-async def connect_kashoo(params: ConnectParams, ctx) -> ActionResult[ConnectionRecord]:
-    """Connect a new account."""
-    client = KashooClient(api_key=params.api_key, base_url=params.base_url)
-    await client.verify_auth()
+async def connect_kashoo(ctx, params: ConnectParams) -> ActionResult[ConnectionRecord]:
+    """Connect a new Kashoo account."""
+    client = KashooClient(
+        auth_token=params.auth_token,
+        business_id=params.business_id,
+        base_url=params.base_url
+    )
+    v_res = await client.verify_auth()
+    if v_res.get("status") == "error":
+        return ActionResult.error(
+            f"Kashoo connection failed: {v_res.get('message')}",
+            code=v_res.get("code", "UNAUTHORIZED")
+        )
+
     conns = await _load_connections(ctx)
-    cid = f"conn_{uuid.uuid4().hex[:8]}"
-    record = {
+    for c in conns:
+        c["is_active"] = False
+
+    cid = str(uuid.uuid4())[:8]
+    rec = {
         "id": cid,
-        "label": params.label or "Kashoo Account",
-        "api_key": params.api_key,
-        "base_url": params.base_url,
+        "label": params.label.strip() or f"Kashoo-{cid}",
+        "auth_token": params.auth_token.strip(),
+        "business_id": params.business_id.strip(),
+        "base_url": client.base_url,
         "is_active": True
     }
-    for c in conns: c["is_active"] = False
-    conns.append(record)
+    conns.append(rec)
     await _save_connections(ctx, conns)
-    return ActionResult.ok(ConnectionRecord(id=cid, label=record["label"], masked_key=_mask(params.api_key), base_url=params.base_url, is_active=True))
+
+    out = ConnectionRecord(
+        id=rec["id"],
+        label=rec["label"],
+        masked_key=_mask(rec["auth_token"]),
+        business_id=rec["business_id"],
+        base_url=rec["base_url"],
+        is_active=True
+    )
+    return ActionResult.ok(
+        out,
+        summary=f"Connected Kashoo business {params.business_id} successfully."
+    )
 
 @chat.function(
     "list_connections",
-    "List connected Kashoo accounts.",
+    "List connected Kashoo accounts without exposing sensitive tokens.",
     action_type="read",
     chain_callable=True,
-    data_model=ConnectionList
+    data_model=NoParams
 )
-async def list_connections(params: NoParams, ctx) -> ActionResult[ConnectionList]:
-    """List connected accounts."""
+async def list_connections(ctx, params: NoParams) -> ActionResult[ConnectionList]:
+    """List all accounts."""
     conns = await _load_connections(ctx)
-    records = [ConnectionRecord(id=c["id"], label=c["label"], masked_key=_mask(c.get("api_key", "")), base_url=c.get("base_url", ""), is_active=c.get("is_active", False)) for c in conns]
-    return ActionResult.ok(ConnectionList(connections=records, total=len(records)))
+    records = [
+        ConnectionRecord(
+            id=c["id"],
+            label=c.get("label", ""),
+            masked_key=_mask(c.get("auth_token", c.get("api_key", ""))),
+            business_id=c.get("business_id", ""),
+            base_url=c.get("base_url", ""),
+            is_active=c.get("is_active", False)
+        )
+        for c in conns
+    ]
+    return ActionResult.ok(
+        ConnectionList(connections=records, total=len(records)),
+        summary=f"Found {len(records)} Kashoo connection(s)."
+    )
 
 @chat.function(
     "disconnect_kashoo",
-    "Disconnect Kashoo account.",
+    "Disconnect a Kashoo account.",
     action_type="write",
     chain_callable=True,
     event="kashoo-connector.disconnect_kashoo",
     effects=["delete:connection"],
-    data_model=DeleteResult
+    data_model=ConnectionIdParams
 )
-async def disconnect_kashoo(params: ConnectionIdParams, ctx) -> ActionResult[DeleteResult]:
+async def disconnect_kashoo(ctx, params: ConnectionIdParams) -> ActionResult[DeleteResult]:
     """Disconnect an account."""
     conns = await _load_connections(ctx)
     target = await resolve_connection(ctx, params.connection_id)
     if not target:
-        return ActionResult.error("Connection not found", code="NOT_FOUND")
-    new_conns = [c for c in conns if c["id"] != target["id"]]
-    if new_conns and target.get("is_active"):
-        new_conns[0]["is_active"] = True
-    await _save_connections(ctx, new_conns)
-    return ActionResult.ok(DeleteResult(id=target["id"], deleted=True, message="Disconnected successfully"))
+        return ActionResult.error("Kashoo connection not found", code="NOT_FOUND")
+
+    conns = [c for c in conns if c["id"] != target["id"]]
+    if conns and not any(c.get("is_active") for c in conns):
+        conns[0]["is_active"] = True
+    await _save_connections(ctx, conns)
+
+    return ActionResult.ok(
+        DeleteResult(id=target["id"], deleted=True, message="Disconnected Kashoo connection"),
+        summary=f"Disconnected Kashoo connection {target['id']}."
+    )
