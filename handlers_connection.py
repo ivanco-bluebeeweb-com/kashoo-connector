@@ -84,7 +84,7 @@ async def connect_kashoo(ctx, params: ConnectParams) -> ActionResult[ConnectionR
         base_url=rec["base_url"],
         is_active=True
     )
-    return ActionResult.ok(
+    return ActionResult.success(
         out,
         summary=f"Connected Kashoo business {params.business_id} successfully."
     )
@@ -110,7 +110,7 @@ async def list_connections(ctx, params: NoParams) -> ActionResult[ConnectionList
         )
         for c in conns
     ]
-    return ActionResult.ok(
+    return ActionResult.success(
         ConnectionList(connections=records, total=len(records)),
         summary=f"Found {len(records)} Kashoo connection(s)."
     )
@@ -136,7 +136,7 @@ async def disconnect_kashoo(ctx, params: ConnectionIdParams) -> ActionResult[Del
         conns[0]["is_active"] = True
     await _save_connections(ctx, conns)
 
-    return ActionResult.ok(
+    return ActionResult.success(
         DeleteResult(id=target["id"], deleted=True, message="Disconnected Kashoo connection"),
         summary=f"Disconnected Kashoo connection {target['id']}."
     )
