@@ -137,6 +137,5 @@ async def disconnect_kashoo(ctx, params: ConnectionIdParams) -> ActionResult[Del
     await _save_connections(ctx, conns)
 
     return ActionResult.success(
-        DeleteResult(id=target["id"], deleted=True, message="Disconnected Kashoo connection"),
-        summary=f"Disconnected Kashoo connection {target['id']}."
+        DeleteResult(id=target["id"], deleted=True, message="Disconnected Kashoo connection"), summary=f"Disconnected Kashoo connection {target['id']}."
     )

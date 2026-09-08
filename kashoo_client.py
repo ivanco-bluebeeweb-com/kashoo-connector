@@ -100,7 +100,8 @@ class KashooClient:
             except Exception as exc:
                 return {"status": "error", "code": "NETWORK_ERROR", "message": self._sanitize_msg(str(exc))}
 
-    async def create_customer(self, payload: dict[str, Any]) -> dict[str, Any]:
+    async def create_customer(self, payload: dict[str, Any] = None, name: str = '', details: Optional[dict[str, Any]] = None) -> dict[str, Any]:
+        if payload is None: payload = {'name': name, **(details or {})}
         url = f"{self.base_url}/api/businesses/{self.business_id}/contacts"
         req_payload = dict(payload)
         req_payload["type"] = "CUSTOMER"
@@ -163,7 +164,8 @@ class KashooClient:
             except Exception as exc:
                 return {"status": "error", "code": "NETWORK_ERROR", "message": self._sanitize_msg(str(exc))}
 
-    async def create_invoice(self, payload: dict[str, Any]) -> dict[str, Any]:
+    async def create_invoice(self, payload: dict[str, Any] = None, name: str = '', details: Optional[dict[str, Any]] = None) -> dict[str, Any]:
+        if payload is None: payload = {'name': name, **(details or {})}
         url = f"{self.base_url}/api/businesses/{self.business_id}/invoices"
         async with httpx.AsyncClient(timeout=self.timeout) as http:
             try:
@@ -224,7 +226,8 @@ class KashooClient:
             except Exception as exc:
                 return {"status": "error", "code": "NETWORK_ERROR", "message": self._sanitize_msg(str(exc))}
 
-    async def create_bill(self, payload: dict[str, Any]) -> dict[str, Any]:
+    async def create_bill(self, payload: dict[str, Any] = None, name: str = '', details: Optional[dict[str, Any]] = None) -> dict[str, Any]:
+        if payload is None: payload = {'name': name, **(details or {})}
         url = f"{self.base_url}/api/businesses/{self.business_id}/bills"
         async with httpx.AsyncClient(timeout=self.timeout) as http:
             try:
@@ -285,7 +288,8 @@ class KashooClient:
             except Exception as exc:
                 return {"status": "error", "code": "NETWORK_ERROR", "message": self._sanitize_msg(str(exc))}
 
-    async def create_payment(self, payload: dict[str, Any]) -> dict[str, Any]:
+    async def create_payment(self, payload: dict[str, Any] = None, name: str = '', details: Optional[dict[str, Any]] = None) -> dict[str, Any]:
+        if payload is None: payload = {'name': name, **(details or {})}
         url = f"{self.base_url}/api/businesses/{self.business_id}/payments"
         async with httpx.AsyncClient(timeout=self.timeout) as http:
             try:
@@ -346,7 +350,8 @@ class KashooClient:
             except Exception as exc:
                 return {"status": "error", "code": "NETWORK_ERROR", "message": self._sanitize_msg(str(exc))}
 
-    async def create_bank_account(self, payload: dict[str, Any]) -> dict[str, Any]:
+    async def create_bank_account(self, payload: dict[str, Any] = None, name: str = '', details: Optional[dict[str, Any]] = None) -> dict[str, Any]:
+        if payload is None: payload = {'name': name, **(details or {})}
         url = f"{self.base_url}/api/businesses/{self.business_id}/accounts"
         req_payload = dict(payload)
         req_payload.setdefault("type", "BANK")
@@ -409,7 +414,8 @@ class KashooClient:
             except Exception as exc:
                 return {"status": "error", "code": "NETWORK_ERROR", "message": self._sanitize_msg(str(exc))}
 
-    async def create_tax_rate(self, payload: dict[str, Any]) -> dict[str, Any]:
+    async def create_tax_rate(self, payload: dict[str, Any] = None, name: str = '', details: Optional[dict[str, Any]] = None) -> dict[str, Any]:
+        if payload is None: payload = {'name': name, **(details or {})}
         url = f"{self.base_url}/api/businesses/{self.business_id}/taxes"
         async with httpx.AsyncClient(timeout=self.timeout) as http:
             try:
